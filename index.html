@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>JS Bin</title>
+    </head>
+    <body>
+        <canvas id='canvas' width=1000 height=500></canvas>
+    </body>
+    <style type='text/css'>
+        canvas {
+            width: 70%;
+            height: 1%;
+            margin: 0px;
+            border: 0;
+            overflow: hidden;
+            background-color: grey;
+            /*  Disable scrollbars */
+            display: block;
+        }
+    </style>
+<select id="type" onclick="shuffle();started=false">
+<option value="selection">Selection</option>
+<option value="bubble">Bubble</option>
+<option value="cocktail">Cocktail</option>
+
+</select>
+<button onclick="Sort=s(document.getElementById('type').value,0);      started = true; ty.type=document.getElementById('type').value
+">GO</button>
+</html>
+<script>
+    const canvas = document.getElementById('canvas'),
+        c = canvas.getContext('2d');
+    let frame = 0;
+    let started = false;
+    class Line {
+        static lines = []
+       
+        static Swap = function(o, oo) {
+            //B[next.index] = me;
+            //B[me.index] = next
+            let x = o.x,
+                xx = oo.x
+            Line.lines[o.index] = oo
+            Line.lines[oo.index] = o
+            o.x = xx;
+            oo.x = x
+        }
+        constructor(val) {
+            this.value = val ?? 1;
+            this.x = (Line.lines.length * 22) + 20
+            this.y = canvas.height;
+            if (!Line.lines.some(o => this.value === o.value)) Line.lines.push(this)
+        }
+        get index() {
+            return Line.lines.indexOf(this)
+        }
+        get lastIndex() {
+            return Line.lines.lastIndexOf(this)
+        }
+        draw() {
+            let index = this.index
+            c.lineWidth = 3
+            c.save()
+            c.translate(this.x, this.y - 3);
+            c.beginPath()
+            c.moveTo(10, -this.value)
+            c.lineTo(-10, -this.value)
+            c.lineTo(-10, 0)
+            c.lineTo(10, 0)
+            c.closePath()
+            c.strokeStyle = 'black'
+            c.stroke()
+            c.restore()
+        }
+    }
+
+    function Update() {
+        c.clearRect(0, 0, canvas.width, canvas.height)
+       // frame = requestAnimationFrame(Update)
+        if (started) {
+          let n = Sort?.next()
+            if (n?.done) {
+            
+                Sort = s(ty.type,0)
+            }
+        }
+        for (let o of Line.lines.flat(1/0)) {
+            o.draw()
+        }
+        if (Line.lines.every((o,index)=>!Line.lines[index+1]||(Line.lines[index+1].value>o.value))) {
+            started = false
+        }
+        c.beginPath()
+        c.lineWidth = 10
+        c.strokeStyle = 'red'
+        c.moveTo(current.x - 10, 10)
+        c.lineTo(current.x + 10, 10)
+        c.stroke()
+        c.fill()
+        /* c.beginPath()
+            c.lineWidth = 10
+c.strokeStyle = 'blue'
+    c.moveTo(current2.x-10,10)
+    c.lineTo(current2.x+10,10)
+    c.stroke()
+    c.fill()*/
+      /* if ( Line.lines.every((o,index)=>!Line.lines[index+1] || (o.value < Line.lines[index+1].value))) {
+
+       
+       }*/
+    }
+    let current;
+    function shuffle(){
+        Line.lines = []
+    for (let i = 0; i < 44; i++) {
+        // let v = Math.floor(Math.random() * random.length)
+        new Line((Math.random() * 400) + 60)
+    }
+    current = Line.lines[0]
+    }
+    shuffle()
+
+  let ty = {
+    type: 'bubble',
+    inst: 0
+  }
+    function* s(type,int) {
+        let B = Line.lines;
+        switch (type) {
+             default: ty.type = 'done'
+          break;
+            case 'bubble': {
+                for (let i = 0, L = B.length; i < L; i++) {
+                    let me = B[i],
+                        next = B[i + 1];
+                                          current = me
+
+                    if (next && next.value < me.value) {
+                        Line.Swap(next, me)
+                        current2 = next
+                                          yield
+
+                    }
+                 
+                  
+                }
+                                      
+
+            }
+            break;
+              case 'cocktail': {
+                for (let i = 0, L = B.length; i < L; i++) {
+                    let me = B[i],
+                        next = B[i + 1];
+
+                    if (next && next.value < me.value) {
+                        Line.Swap(next, me)
+                        current = me
+
+                        current2 = next
+                                          yield
+
+                    }
+                  
+                  
+                }                 
+                
+   for (let i = B.length; i > 0; i--) {
+                    let me = B[i-1],
+                        next = B[i];
+
+                    if (next && next.value < me.value) {
+                        Line.Swap(next, me)
+                        current = me
+
+                        current2 = next
+                                          yield
+
+                    }
+                  
+                  
+                }   
+            }
+            break;
+          case 'selection':{
+let smallest = B[int]
+          for (let i = int; i < B.length; i++) {
+            if (B[i].value < smallest.value) {
+              smallest =B[i]
+            }
+            yield current = B[i]
+          }
+              
+            Line.Swap(smallest,B[int++])
+        if (int < B.length){ 
+          yield Sort = s(ty.type,int)}
+            else {
+              yield Sort = s()
+            }
+          }
+            
+         break;
+          case 'merge': {
+           
+for (let i = 0; i < Line.lines.length; i++) {
+  yield current = Line.lines[i]
+
+
+      
+}
+            
+
+          }
+        }
+    }
+      let Sort;
+let n ;
+    function Start(t) {
+ty.type = t;
+      Sort = s(t,0)
+  }
+  
+Update()
+     let    current2 = current;
+     n=setInterval(Update,10);
+
+</script>
