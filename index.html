@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Sort</title>
-    </head>
-    <body>
-        <canvas id='canvas' width=1000 height=500></canvas>
-    </body>
-    <style type='text/css'>
-        canvas {
-            width: 70%;
-            height: 1%;
-            margin: 0px;
-            border: 0;
-            overflow: hidden;
-            background-color: grey;
-            /*  Disable scrollbars */
-            display: block;
-        }
-    </style>
+
+<head>
+    <meta charset="utf-8">
+    <title>Sort</title>
+</head>
+
+<body>
+    <canvas id='canvas' width=2000 height=500></canvas>
+</body>
+<style type='text/css'>
+    canvas {
+        width: 100%;
+        height: 1%;
+        margin: 0px;
+        border: 0;
+        overflow: hidden;
+        background-color: black;
+        /*  Disable scrollbars */
+        display: block;
+    }
+</style>
 <select id="type" onclick="shuffle();started=false">
-<option value="selection">Selection</option>
-<option value="bubble">Bubble</option>
-<option value="cocktail">Cocktail</option>
+    <option value="selection">Selection</option>
+    <option value="bubble">Bubble</option>
+    <option value="cocktail">Cocktail</option>
 
 </select>
-<button onclick="Sort=s(document.getElementById('type').value,0);      started = true; ty.type=document.getElementById('type').value
+<button onclick="Sort=s(document.getElementById('type').value,0); console.log('%cSorting...','color: yellow');     started = true; ty.type=document.getElementById('type').value
 ">GO</button>
+
 </html>
 <script>
     const canvas = document.getElementById('canvas'),
         c = canvas.getContext('2d');
     let frame = 0;
     let started = false;
+    c.lineJoin = "round";
     class Line {
         static lines = []
-       
-        static Swap = function(o, oo) {
+
+        static Swap = function (o, oo) {
             //B[next.index] = me;
             //B[me.index] = next
             let x = o.x,
@@ -51,6 +55,7 @@
             this.x = (Line.lines.length * 22) + 20
             this.y = canvas.height;
             if (!Line.lines.some(o => this.value === o.value)) Line.lines.push(this)
+            this.color = `hsl(${((this.value))}, 100%, 50%)`
         }
         get index() {
             return Line.lines.indexOf(this)
@@ -70,26 +75,30 @@
             c.lineTo(10, 0)
             c.closePath()
             c.strokeStyle = 'black'
+            c.fillStyle = this.color
             c.stroke()
+            c.fill()
             c.restore()
         }
     }
 
     function Update() {
         c.clearRect(0, 0, canvas.width, canvas.height)
-       // frame = requestAnimationFrame(Update)
+        // frame = requestAnimationFrame(Update)
         if (started) {
-          let n = Sort?.next()
+            let n = Sort?.next()
             if (n?.done) {
-            
-                Sort = s(ty.type,0)
+
+                Sort = s(ty.type, 0)
             }
         }
-        for (let o of Line.lines.flat(1/0)) {
+        for (let o of Line.lines.flat(1 / 0)) {
             o.draw()
         }
-        if (Line.lines.every((o,index)=>!Line.lines[index+1]||(Line.lines[index+1].value>o.value))) {
+        if (Line.lines.every((o, index) => !Line.lines[index + 1] || (Line.lines[index + 1].value > o.value)) && started) {
             started = false
+            console.log('%cDone ✓', 'color: limegreen')
+            console.log('%c■%c■%c■%c■%c■%c■', 'color:red', 'color:orange', 'color:yellow', 'color:green', 'color:blue', 'color:purple')
         }
         c.beginPath()
         c.lineWidth = 10
@@ -105,51 +114,60 @@ c.strokeStyle = 'blue'
     c.lineTo(current2.x+10,10)
     c.stroke()
     c.fill()*/
-      /* if ( Line.lines.every((o,index)=>!Line.lines[index+1] || (o.value < Line.lines[index+1].value))) {
-
-       
-       }*/
+        /* if ( Line.lines.every((o,index)=>!Line.lines[index+1] || (o.value < Line.lines[index+1].value))) {
+  
+         
+         }*/
     }
     let current;
-    function shuffle(){
-        Line.lines = []
-    for (let i = 0; i < 44; i++) {
-        // let v = Math.floor(Math.random() * random.length)
-        new Line((Math.random() * 400) + 60)
+    function shuffleArr(arr) {
+        Array.isArray(arr) || (() => console.error('Array needed.'))();
+        let a = arr.slice(); // Make a copy of the array to avoid modifying the original array
+        for (let i = a.length - 1; i > 0; i--) {
+            let rand = Math.floor(Math.random() * (i + 1));
+            [a[i], a[rand]] = [a[rand], a[i]]; // Swap elements
+        }
+        return a;
     }
-    current = Line.lines[0]
+    function shuffle() {
+        Line.lines = []
+        for (let i = 0; i < 90; i++) {
+            // let v = Math.floor(Math.random() * random.length)
+            new Line((Math.random() * 450) + 30)
+        }
+        current = Line.lines[0]
     }
     shuffle()
 
-  let ty = {
-    type: 'bubble',
-    inst: 0
-  }
-    function* s(type,int) {
+    let ty = {
+        type: 'bubble',
+        inst: 0
+    }
+    function* s(type, int) {
         let B = Line.lines;
         switch (type) {
-             default: ty.type = 'done'
-          break;
+            default: ty.type = 'done'
+                break;
             case 'bubble': {
                 for (let i = 0, L = B.length; i < L; i++) {
                     let me = B[i],
                         next = B[i + 1];
-                                          current = me
+                    current = me
 
                     if (next && next.value < me.value) {
                         Line.Swap(next, me)
                         current2 = next
-                                          yield
+                        yield
 
                     }
-                 
-                  
+
+
                 }
-                                      
+
 
             }
-            break;
-              case 'cocktail': {
+                break;
+            case 'cocktail': {
                 for (let i = 0, L = B.length; i < L; i++) {
                     let me = B[i],
                         next = B[i + 1];
@@ -159,15 +177,15 @@ c.strokeStyle = 'blue'
                         current = me
 
                         current2 = next
-                                          yield
+                        yield
 
                     }
-                  
-                  
-                }                 
-                
-   for (let i = B.length; i > 0; i--) {
-                    let me = B[i-1],
+
+
+                }
+
+                for (let i = B.length; i > 0; i--) {
+                    let me = B[i - 1],
                         next = B[i];
 
                     if (next && next.value < me.value) {
@@ -175,54 +193,65 @@ c.strokeStyle = 'blue'
                         current = me
 
                         current2 = next
-                                          yield
+                        yield
 
                     }
-                  
-                  
-                }   
-            }
-            break;
-          case 'selection':{
-let smallest = B[int]
-          for (let i = int; i < B.length; i++) {
-            if (B[i].value < smallest.value) {
-              smallest =B[i]
-            }
-            yield current = B[i]
-          }
-              
-            Line.Swap(smallest,B[int++])
-        if (int < B.length){ 
-          yield Sort = s(ty.type,int)}
-            else {
-              yield Sort = s()
-            }
-          }
-            
-         break;
-          case 'merge': {
-           
-for (let i = 0; i < Line.lines.length; i++) {
-  yield current = Line.lines[i]
 
 
-      
-}
-            
+                }
+            }
+                break;
+            case 'selection': {
+                let smallest = B[int]
+                for (let i = int; i < B.length; i++) {
+                    if (B[i].value < smallest.value) {
+                        smallest = B[i]
+                    }
+                    yield current = B[i]
+                }
 
-          }
+                Line.Swap(smallest, B[int++])
+                if (int < B.length) {
+                    yield Sort = s(ty.type, int)
+                }
+                else {
+                    yield Sort = s()
+                }
+            }
+
+                break;
+            case 'merge': {
+current = Line.lines[0]
+               Line.lines.forEach(o=>{
+                if(!Array.isArray(o)) o =[o]
+
+               })
+                for (let i = 0; i < Line.lines.length - 1; i++) {
+
+                    yield current = Line.lines[i][0];
+
+                    if (Line.lines[i][0] && Line.lines[i + 1][0].value < current.value) {
+                        let x = Line.lines[i + 1]
+                        Line.lines[i + 1] = current
+                        Line.lines[i] = x[0];
+                        yield
+                    }
+                }
+
+
+            }
         }
     }
-      let Sort;
-let n ;
+    let Sort;
+    let n;
     function Start(t) {
-ty.type = t;
-      Sort = s(t,0)
-  }
-  
-Update()
-     let    current2 = current;
-     n=setInterval(Update,10);
+        ty.type = t;
+        Sort = s(t, 0)
+    }
+
+    Update()
+    let current2 = current;
+    n = setInterval(Update);
+
 
 </script>
